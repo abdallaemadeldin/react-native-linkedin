@@ -12,7 +12,8 @@ import {
   Text,
   Modal,
   StyleSheet,
-  Image
+  Image,
+  // $DisableFlow
 } from 'react-native'
 import PropTypes from 'prop-types'
 import { pipe, evolve, propSatisfies, applySpec, propOr } from 'ramda'
@@ -56,7 +57,7 @@ type Props = {
   containerStyle?: any,
   wrapperStyle?: any,
   closeStyle?: any,
-  shouldGetAccessToken: boolean,
+  shouldGetAccessToken: boolean
 }
 /* eslint-enable */
 
@@ -207,7 +208,6 @@ export default class LinkedInModal extends React.Component {
     wrapperStyle: ViewPropTypes.style,
     closeStyle: ViewPropTypes.style,
     shouldGetAccessToken: PropTypes.bool,
-    openMoadl: PropTypes.bool.isRequired
   }
   static defaultProps = {
     onError: logError,
@@ -217,7 +217,6 @@ export default class LinkedInModal extends React.Component {
     wrapperStyle: StyleSheet.create({}),
     closeStyle: StyleSheet.create({}),
     shouldGetAccessToken: true,
-    openMoadl: false
   }
   state: State = {
     raceCondition: false,
@@ -314,13 +313,14 @@ export default class LinkedInModal extends React.Component {
 
   render() {
     const { modalVisible } = this.state
-    const { containerStyle, wrapperStyle, closeStyle, openMoadl } = this.props
+    const { containerStyle, wrapperStyle, closeStyle, buttonStyle } = this.props
     return (
-      <View>
+      <View style={buttonStyle}>
+        <TouchableOpacity onPress={this.open}>{this.renderButton()}</TouchableOpacity>
         <Modal
           animationType='fade'
           transparent
-          visible={openMoadl}
+          visible={modalVisible}
           onRequestClose={this.close}
         >
           <View style={[styles.constainer, containerStyle]}>
