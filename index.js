@@ -12,16 +12,15 @@ import {
   Text,
   Modal,
   StyleSheet,
-  Image,
-  // $DisableFlow
+  Image
 } from 'react-native'
 import PropTypes from 'prop-types'
 import { pipe, evolve, propSatisfies, applySpec, propOr } from 'ramda'
 import { v4 } from 'uuid'
 import querystring from 'query-string'
 
-const AUTHORIZATION_URL: string = 'https://www.linkedin.com/oauth/v2/authorization'
-const ACCESS_TOKEN_URL: string = 'https://www.linkedin.com/oauth/v2/accessToken'
+const AUTHORIZATION_URL: string = 'https://www.linkedin.com/uas/oauth2/authorization'
+const ACCESS_TOKEN_URL: string = 'https://www.linkedin.com/uas/oauth2/accessToken'
 
 export type LinkedInToken = {
   access_token?: string,
@@ -42,7 +41,7 @@ type State = {
 /* eslint-disable */
 type Props = {
   clientID: string,
-  clientSecret?: string,
+  clientSecret: string,
   redirectUri: string,
   onSuccess: (LinkedInToken | {}) => void,
   onError: ErrorType => void,
@@ -57,7 +56,6 @@ type Props = {
   containerStyle?: any,
   wrapperStyle?: any,
   closeStyle?: any,
-  animationType?: 'none' | 'fade' | 'slide',
   shouldGetAccessToken: boolean,
 }
 /* eslint-enable */
@@ -193,7 +191,7 @@ const styles = StyleSheet.create({
 export default class LinkedInModal extends React.Component {
   static propTypes = {
     clientID: PropTypes.string.isRequired,
-    clientSecret: PropTypes.string,
+    clientSecret: PropTypes.string.isRequired,
     redirectUri: PropTypes.string.isRequired,
     permissions: PropTypes.array,
     authState: PropTypes.string,
@@ -208,20 +206,18 @@ export default class LinkedInModal extends React.Component {
     containerStyle: ViewPropTypes.style,
     wrapperStyle: ViewPropTypes.style,
     closeStyle: ViewPropTypes.style,
-    animationType: PropTypes.string,
     shouldGetAccessToken: PropTypes.bool,
-    openModal: PropTypes.bool.isRequired
+    openMoadl: PropTypes.bool.isRequired
   }
   static defaultProps = {
     onError: logError,
     permissions: ['r_basicprofile', 'r_emailaddress'],
     linkText: 'Login with LinkedIn',
-    animationType: 'fade',
     containerStyle: StyleSheet.create({}),
     wrapperStyle: StyleSheet.create({}),
     closeStyle: StyleSheet.create({}),
     shouldGetAccessToken: true,
-    openModal: false
+    openMoadl: false
   }
   state: State = {
     raceCondition: false,
@@ -236,7 +232,7 @@ export default class LinkedInModal extends React.Component {
     }
   }
 
-  onNavigationStateChange = async ({ url }: Object) => {
+  onLoadStart = async ({ nativeEvent: { url } }: Object) => {
     const { raceCondition } = this.state
     const { redirectUri, onError, shouldGetAccessToken } = this.props
 
@@ -307,7 +303,7 @@ export default class LinkedInModal extends React.Component {
     return (
       <WebView
         source={{ uri: this.getAuthorizationUrl() }}
-        onNavigationStateChange={this.onNavigationStateChange}
+        onLoadStart={this.onLoadStart}
         startInLoadingState
         javaScriptEnabled
         domStorageEnabled
@@ -318,30 +314,18 @@ export default class LinkedInModal extends React.Component {
 
   render() {
     const { modalVisible } = this.state
-    const { animationType, containerStyle, wrapperStyle, closeStyle, openModal } = this.props
+    const { containerStyle, wrapperStyle, closeStyle, openMoadl } = this.props
     return (
       <View>
-        {/* <TouchableOpacity
-          accessibilityComponentType={'button'}
-          accessibilityTraits={['button']}
-          onPress={this.open}
-        >
-          {this.renderButton()}
-        </TouchableOpacity> */}
         <Modal
-          animationType={animationType}
+          animationType='fade'
           transparent
-          visible={openModal}
+          visible={openMoadl}
           onRequestClose={this.close}
         >
           <View style={[styles.constainer, containerStyle]}>
             <View style={[styles.wrapper, wrapperStyle]}>{this.renderWebview()}</View>
-            <TouchableOpacity
-              onPress={this.close}
-              style={[styles.close, closeStyle]}
-              accessibilityComponentType={'button'}
-              accessibilityTraits={['button']}
-            >
+            <TouchableOpacity onPress={this.close} style={[styles.close, closeStyle]}>
               {this.renderClose()}
             </TouchableOpacity>
           </View>
